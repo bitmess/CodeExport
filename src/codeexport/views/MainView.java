@@ -99,9 +99,8 @@ public class MainView extends ViewPart {
 			result = result.replaceAll("\\*[\\w\\W]*?\\*/", "");
 			result = result.replaceAll("//.*", "");
 			
-			//去掉空白行
-			result = result.replaceAll("^(\\s*)\\r\\n", "");
-			result = result.replaceAll("^(\\s*)\\n", "");
+			//去掉空白行(?m)^\\s*$(\\n|\\r\\n)
+			result = result.replaceAll("(?m)^\\s*$(\\n|\\r\\n)", "");
 			
 			FileUtils.write(f, result, "UTF-8", true);
 		}
@@ -136,11 +135,11 @@ public class MainView extends ViewPart {
 //		document.write(out);
 //		out.close();
 //		
-//		inputDirText.setEnabled(true);
-//		exportFilePathText.setEnabled(true);
-//		exportButton.setEnabled(true);
-//		inputButton.setEnabled(true);
-//		exportFileButton.setEnabled(true);
+		inputDirText.setEnabled(true);
+		exportFilePathText.setEnabled(true);
+		exportButton.setEnabled(true);
+		inputButton.setEnabled(true);
+		exportFileButton.setEnabled(true);
 	}
 
 	private void startExport() throws IOException {
