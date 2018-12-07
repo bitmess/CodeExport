@@ -111,7 +111,6 @@ public class MainView extends ViewPart {
 //		word
 		// Write the Document in file system
 //		exportPath
-		System.out.println(exportPath);
 		FileOutputStream out = new FileOutputStream(new File(exportPath));
 //		FileOutputStream out = new FileOutputStream(new File("/Users/jv/Desktop/create_toc.docx"));
 
