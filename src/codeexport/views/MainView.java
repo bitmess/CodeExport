@@ -80,14 +80,48 @@ public class MainView extends ViewPart {
 		
 		
 		inputDirText.getText();
-		String[] fileFilter = new String[] {"java"};
+		String[] fileFilter = new String[] {"m","java"};
 		Collection<File> pathes = FileUtils.listFiles(new File(inputDirText.getText()), fileFilter, true);
+		String exportPath = exportFilePathText.getText();
+		exportPath = exportPath + File.separator + System.currentTimeMillis() + ".docx";
 		
 //		txt
-		String exportPath = exportFilePathText.getText();
-		exportPath = exportPath + File.pathSeparator + System.currentTimeMillis();
-		File f = new File(exportPath);
+//		File f = new File(exportPath);
+//		for (File file : pathes) {
+//			StringBuffer sb = new StringBuffer();
+//			List<String> readLines = FileUtils.readLines(file, "UTF-8");
+//			for (int i = 0; i < readLines.size(); i++) {
+//				String string = readLines.get(i);
+//				sb.append(string).append(System.getProperty("line.separator"));
+//			}
+//			
+//			String result = sb.toString();
+//			//去掉注释
+//			///\*[\w\W]*?\*/
+//			////.*
+//			result = result.replaceAll("\\*[\\w\\W]*?\\*/", "");
+//			result = result.replaceAll("//.*", "");
+//			
+//			//去掉空白行(?m)^\\s*$(\\n|\\r\\n)
+//			result = result.replaceAll("(?m)^\\s*$(\\n|\\r\\n)", "");
+//			
+//			FileUtils.write(f, result, "UTF-8", true);
+//		}
+		
+//		word
+		// Write the Document in file system
+//		exportPath
+		System.out.println(exportPath);
+		FileOutputStream out = new FileOutputStream(new File(exportPath));
+//		FileOutputStream out = new FileOutputStream(new File("/Users/jv/Desktop/create_toc.docx"));
+
+
+		// 段落
 		for (File file : pathes) {
+			XWPFParagraph firstParagraph = document.createParagraph();
+			firstParagraph.setAlignment(ParagraphAlignment.LEFT);
+			
+			XWPFRun run = firstParagraph.createRun();
 			StringBuffer sb = new StringBuffer();
 			List<String> readLines = FileUtils.readLines(file, "UTF-8");
 			for (int i = 0; i < readLines.size(); i++) {
@@ -105,39 +139,25 @@ public class MainView extends ViewPart {
 			//去掉空白行(?m)^\\s*$(\\n|\\r\\n)
 			result = result.replaceAll("(?m)^\\s*$(\\n|\\r\\n)", "");
 			
-			FileUtils.write(f, result, "UTF-8", true);
+			if (result.contains("\n")) {
+                String[] lines = result.split("\n");
+                run.setText(lines[0], 0); // set first line into XWPFRun
+                for(int i=1;i<lines.length;i++){
+                    // add break and insert new text
+                    run.addBreak();
+                    run.setText(lines[i]);
+                }
+            } else {
+                run.setText(result, 0);
+            }
 		}
 		
-//		word
-//		// Write the Document in file system
-//		FileOutputStream out = new FileOutputStream(new File("/Users/jv/Desktop/create_toc.docx"));
-//
-//
-//		// 段落
-//		for (File file : pathes) {
-//			XWPFParagraph firstParagraph = document.createParagraph();
-//			firstParagraph.setSpacingAfter(0);
-//			firstParagraph.setSpacingBefore(0);
-//			
-//			XWPFRun run = firstParagraph.createRun();
-//			StringBuffer sb = new StringBuffer();
-//			List<String> readLines = FileUtils.readLines(file, "UTF-8");
-//			for (int i = 0; i < readLines.size(); i++) {
-//				String string = readLines.get(i);
-//				sb.append(string).append(System.getProperty("line.separator"));
-//			}
-//			run.setText(new String(sb));
-//			run.setColor("696969");
-//			run.setFontSize(18);
-//		}
-//		
-//
-//
-//		document.createTOC();
-//
-//		document.write(out);
-//		out.close();
-//		
+
+		document.createTOC();
+
+		document.write(out);
+		out.close();
+		
 		inputDirText.setEnabled(true);
 		exportFilePathText.setEnabled(true);
 		exportButton.setEnabled(true);
