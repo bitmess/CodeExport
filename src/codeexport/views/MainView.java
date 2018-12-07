@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -79,11 +80,13 @@ public class MainView extends ViewPart {
 		
 		
 		inputDirText.getText();
-		String[] fileFilter = new String[] {"m"};
+		String[] fileFilter = new String[] {"java"};
 		Collection<File> pathes = FileUtils.listFiles(new File(inputDirText.getText()), fileFilter, true);
 		
 //		txt
-		File f = new File("/Users/jv/Desktop/123.txt");
+		String exportPath = exportFilePathText.getText();
+		exportPath = exportPath + File.pathSeparator + System.currentTimeMillis();
+		File f = new File(exportPath);
 		for (File file : pathes) {
 			StringBuffer sb = new StringBuffer();
 			List<String> readLines = FileUtils.readLines(file, "UTF-8");
