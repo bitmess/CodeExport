@@ -31,4 +31,5 @@ Bundle-ClassPath: .,
  lib/poi-ooxml-4.0.1.jar,
  lib/poi-ooxml-schemas-4.0.1.jar,
  lib/poi-scratchpad-4.0.1.jar,
- lib/xmlbeans-3.0.2.jar
+ lib/xmlbeans-3.0.2.jar,
+ lib/commons-io-2.6.jar
