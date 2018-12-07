@@ -81,6 +81,8 @@ public class MainView extends ViewPart {
 
 	@Inject IWorkbench workbench;
 	private Text text;
+
+	private Button btnNewButton;
 	 
 
 	/**
@@ -139,7 +141,7 @@ public class MainView extends ViewPart {
 		text = new Text(parent, SWT.BORDER);
 		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
-		Button btnNewButton = new Button(parent, SWT.NONE);
+		btnNewButton = new Button(parent, SWT.NONE);
 		btnNewButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -149,7 +151,7 @@ public class MainView extends ViewPart {
 			}
 		});
 		btnNewButton.setText("选择目录");
-		new Label(parent, SWT.NONE);
+		
 		
 		Button button = new Button(parent, SWT.NONE);
 		button.addSelectionListener(new SelectionAdapter() {
@@ -159,14 +161,14 @@ public class MainView extends ViewPart {
 		});
 		button.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 		button.setText("开始");
-		new Label(parent, SWT.NONE);
+		
+		
 		
 	}
 
 
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
-		
+		btnNewButton.setFocus();
 	}
 }
