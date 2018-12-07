@@ -28,6 +28,8 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.ISharedImages;
@@ -41,6 +43,14 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 
 /**
  * This sample class demonstrates how to plug-in a new
@@ -70,6 +80,7 @@ public class MainView extends ViewPart {
 	public static final String ID = "codeexport.views.MainView";
 
 	@Inject IWorkbench workbench;
+	private Text text;
 	 
 
 	/**
@@ -119,8 +130,36 @@ public class MainView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		parent.setLayout(new FormLayout());
-		// TODO Auto-generated method stub
+		parent.setLayout(new GridLayout(3, false));
+		
+		Label fileLabel = new Label(parent, SWT.NONE);
+		fileLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		fileLabel.setText("目录路径");
+		
+		text = new Text(parent, SWT.BORDER);
+		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		
+		Button btnNewButton = new Button(parent, SWT.NONE);
+		btnNewButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				DirectoryDialog dd = new DirectoryDialog(workbench.getDisplay().getActiveShell());
+				String path = dd.open();
+				text.setText(path);
+			}
+		});
+		btnNewButton.setText("选择目录");
+		new Label(parent, SWT.NONE);
+		
+		Button button = new Button(parent, SWT.NONE);
+		button.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+			}
+		});
+		button.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
+		button.setText("开始");
+		new Label(parent, SWT.NONE);
 		
 	}
 
