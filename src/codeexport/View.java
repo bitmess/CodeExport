@@ -1,28 +1,28 @@
 package codeexport;
 
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.resource.JFaceResources;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
 
 public class View extends ViewPart {
+	public View() {
+	}
 
 	public static final String ID = "CodeExport.view";
 
-	/**
-	 * The text control that's displaying the content of the email message.
-	 */
-	private Text messageText;
-	
 	@Override
 	public void createPartControl(Composite parent) {
 		Composite top = new Composite(parent, SWT.NONE);
@@ -30,65 +30,69 @@ public class View extends ViewPart {
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		top.setLayout(layout);
-		// top banner
-		Composite banner = new Composite(top, SWT.NONE);
-		banner.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL, GridData.VERTICAL_ALIGN_BEGINNING, true, false));
-		layout = new GridLayout();
-		layout.marginHeight = 5;
-		layout.marginWidth = 10;
-		layout.numColumns = 2;
-		banner.setLayout(layout);
-		
-		// setup bold font
-		Font boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DEFAULT_FONT);    
-		
-		Label l = new Label(banner, SWT.NONE);
-		l.setText("Subject:");
-		l.setFont(boldFont);
-		l.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-		
-		l = new Label(banner, SWT.WRAP);
-		l.setText("This is a message about the cool Eclipse RCP!");
-		l.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true, false));
-		
-		l = new Label(banner, SWT.NONE);
-		l.setText("From:");
-		l.setFont(boldFont);
-		l.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
-    
-		final Link link = new Link(banner, SWT.NONE);
-		link.setText("<a>nicole@mail.org</a>");
-		link.addSelectionListener(new SelectionAdapter() {    
+
+		Button btnClick = new Button(top, SWT.NONE);
+		btnClick.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
-				MessageDialog.openInformation(getSite().getShell(), "Not Implemented", "Imagine the address book or a new message being created now.");
-			}    
+				try {
+					createWord2007();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
 		});
-		link.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true, false));
-    
-		l = new Label(banner, SWT.NONE);
-		l.setText("Date:");
-		l.setFont(boldFont);
-		l.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false));
+		btnClick.setText("click");
 		
-		l = new Label(banner, SWT.WRAP);
-		l.setText("10:34 am");
-		l.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true, false));
-		
-		// message contents
-		messageText = new Text(top, SWT.MULTI | SWT.WRAP);
-		messageText.setText("This RCP Application was generated from the PDE Plug-in Project wizard. This sample shows how to:\n"+
-						"- add a top-level menu and toolbar with actions\n"+
-						"- add keybindings to actions\n" +
-						"- create views that can't be closed and\n"+
-						"  multiple instances of the same view\n"+
-						"- perspectives with placeholders for new views\n"+
-						"- use the default about dialog\n"+
-						"- create a product definition\n");
-		messageText.setLayoutData(new GridData(GridData.FILL_BOTH));
+
 	}
 
 	@Override
 	public void setFocus() {
-		messageText.setFocus();
 	}
+
+	/**
+	 * 2007word文档创建
+	 * @throws IOException 
+	 */
+	public void createWord2007() throws IOException {
+		XWPFDocument document= new XWPFDocument();
+
+        //Write the Document in file system
+        FileOutputStream out = new FileOutputStream(new File("/Users/jv/Desktop/create_toc.docx"));
+
+        //添加标题
+        XWPFParagraph titleParagraph = document.createParagraph();
+
+        //设置段落居中
+        titleParagraph.setAlignment(ParagraphAlignment.CENTER);
+
+        XWPFRun titleParagraphRun = titleParagraph.createRun();
+        titleParagraphRun.setText("Java PoI");
+        titleParagraphRun.setColor("000000");
+        titleParagraphRun.setFontSize(20);
+
+        //段落
+        XWPFParagraph firstParagraph = document.createParagraph();
+        firstParagraph.setStyle("Heading1");
+        XWPFRun run = firstParagraph.createRun();
+        run.setText("段落1。");
+        run.setColor("696969");
+        run.setFontSize(18);
+
+
+        //段落
+        XWPFParagraph firstParagraph1 = document.createParagraph();
+        firstParagraph.setStyle("Heading1");
+        XWPFRun run1 = firstParagraph1.createRun();
+        run1.setText("段落2");
+        run1.setColor("696969");
+        run1.setFontSize(16);
+
+        document.createTOC();
+
+        document.write(out);
+        out.close();
+	}
+
 }
