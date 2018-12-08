@@ -312,7 +312,7 @@ public class MainView extends ViewPart {
 		combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(new FillLayout(SWT.HORIZONTAL));
+		composite.setLayout(new FillLayout(SWT.VERTICAL));
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
 
 		addFileTypeButton = new Button(composite, SWT.NONE);
@@ -354,6 +354,7 @@ public class MainView extends ViewPart {
 		});
 		exportFileButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 		exportFileButton.setText("开始");
+		new Label(parent, SWT.NONE);
 
 	}
 

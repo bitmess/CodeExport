@@ -35,7 +35,7 @@
          </property>
          <property
                name="windowImages"
-               value="icons/word.png">
+               value="icons/word.png,icons/word32.png,icons/word48.png,icons/word64.png,icons/word128.png,icons/word256.png">
          </property>
          <property
                name="aboutImage"
