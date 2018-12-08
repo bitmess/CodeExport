@@ -1,40 +1,41 @@
 package codeexport.views;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.poi.hpsf.MarkUnsupportedException;
+import org.apache.poi.hpsf.NoPropertySetStreamException;
+import org.apache.poi.hpsf.SummaryInformation;
+import org.apache.poi.ooxml.POIXMLDocument;
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.jface.viewers.ComboViewer;
 
 /**
  * This sample class demonstrates how to plug-in a new workbench view. The view
@@ -54,7 +55,6 @@ import org.eclipse.jface.viewers.ComboViewer;
 public class MainView extends ViewPart {
 
 	public MainView() {
-		document = new XWPFDocument();
 	}
 
 	/**
@@ -89,8 +89,7 @@ public class MainView extends ViewPart {
 	 */
 	private void createWord2007() throws IOException {
 
-		inputDirText.getText();
-		String[] fileFilter = new String[] { "m", "java" };
+		String[] fileFilter = combo.getItems();
 		Collection<File> pathes = FileUtils.listFiles(new File(inputDirText.getText()), fileFilter, true);
 		String exportPath = exportFilePathText.getText();
 		exportPath = exportPath + File.separator + System.currentTimeMillis() + ".docx";
@@ -123,6 +122,8 @@ public class MainView extends ViewPart {
 //		exportPath
 		FileOutputStream out = new FileOutputStream(new File(exportPath));
 //		FileOutputStream out = new FileOutputStream(new File("/Users/jv/Desktop/create_toc.docx"));
+
+		document = new XWPFDocument();// 文档
 
 		// 段落
 		for (File file : pathes) {
@@ -161,9 +162,23 @@ public class MainView extends ViewPart {
 		}
 
 		document.createTOC();
-
+		
 		document.write(out);
 		out.close();
+		
+		FileInputStream in = new FileInputStream(new File(exportPath));
+		SummaryInformation si;
+		try {
+			si = new SummaryInformation(in);
+			System.out.println(si.getPageCount());
+		} catch (NoPropertySetStreamException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MarkUnsupportedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        in.close();
 
 		addFileTypeButton.setEnabled(true);
 		resetFileTypeButton.setEnabled(true);
@@ -191,6 +206,12 @@ public class MainView extends ViewPart {
 			MessageDialog.openError(null, "提示", "导出目录为空");
 			exportButton.notifyListeners(SWT.Selection, new Event());
 
+			return;
+		}
+
+		if (combo.getItems().length == 0) {
+			MessageDialog.openError(null, "提示", "文件类型不能为空");
+			combo.setFocus();
 			return;
 		}
 
