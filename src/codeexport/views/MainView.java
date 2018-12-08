@@ -1,7 +1,6 @@
 package codeexport.views;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
@@ -10,10 +9,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.poi.hpsf.MarkUnsupportedException;
-import org.apache.poi.hpsf.NoPropertySetStreamException;
-import org.apache.poi.hpsf.SummaryInformation;
-import org.apache.poi.ooxml.POIXMLDocument;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -160,25 +155,13 @@ public class MainView extends ViewPart {
 				run.setText(result, 0);
 			}
 		}
+		
 
 		document.createTOC();
 		
+
 		document.write(out);
 		out.close();
-		
-		FileInputStream in = new FileInputStream(new File(exportPath));
-		SummaryInformation si;
-		try {
-			si = new SummaryInformation(in);
-			System.out.println(si.getPageCount());
-		} catch (NoPropertySetStreamException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MarkUnsupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        in.close();
 
 		addFileTypeButton.setEnabled(true);
 		resetFileTypeButton.setEnabled(true);
