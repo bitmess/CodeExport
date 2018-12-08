@@ -15,7 +15,18 @@
       </vmArgsMac>
    </launcherArgs>
 
-   <windowImages i16="icons/word.png"/>
+   <windowImages i16="icons/word.png" i32="icons/word32.png" i48="icons/word48.png" i64="icons/word64.png" i128="icons/word128.png" i256="icons/word256.png"/>
+
+
+   <launcher>
+      <win useIco="false">
+         <bmp/>
+      </win>
+   </launcher>
+
+
+   <vm>
+   </vm>
 
    <plugins>
       <plugin id="CodeExport"/>
@@ -91,5 +102,12 @@
       <plugin id="org.w3c.dom.svg"/>
    </plugins>
 
+
+   <preferencesInfo>
+      <targetfile overwrite="false"/>
+   </preferencesInfo>
+
+   <cssInfo>
+   </cssInfo>
 
 </product>
