@@ -1,6 +1,7 @@
 package codeexport.views;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
@@ -15,6 +16,7 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -26,10 +28,13 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -83,11 +88,18 @@ public class MainView extends ViewPart {
 	 * @throws IOException
 	 */
 	private void createWord2007() throws IOException {
+		
+
+		IActionBars bars = getViewSite().getActionBars();
+		bars.getStatusLineManager().setMessage("处理中");
 
 		String[] fileFilter = combo.getItems();
-		Collection<File> pathes = FileUtils.listFiles(new File(inputDirText.getText()), fileFilter, true);
-		String exportPath = exportFilePathText.getText();
-		exportPath = exportPath + File.separator + System.currentTimeMillis() + ".docx";
+
+		Display.getDefault().asyncExec(() -> {
+
+			Collection<File> pathes = FileUtils.listFiles(new File(inputDirText.getText()), fileFilter, true);
+			String exportPath = exportFilePathText.getText();
+			exportPath = exportPath + File.separator + System.currentTimeMillis() + ".docx";
 
 //		txt
 //		File f = new File(exportPath);
@@ -113,64 +125,106 @@ public class MainView extends ViewPart {
 //		}
 
 //		word
-		// Write the Document in file system
+			// Write the Document in file system
 //		exportPath
-		FileOutputStream out = new FileOutputStream(new File(exportPath));
+			FileOutputStream out;
+			try {
+				out = new FileOutputStream(new File(exportPath));
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				Display.getDefault().syncExec(() -> {
+
+					bars.getStatusLineManager().setMessage("错误");
+					updateUIByEnable(true);
+
+				});
+				return;
+			}
 //		FileOutputStream out = new FileOutputStream(new File("/Users/jv/Desktop/create_toc.docx"));
 
-		document = new XWPFDocument();// 文档
+			document = new XWPFDocument();// 文档
 
-		// 段落
-		for (File file : pathes) {
-			XWPFParagraph firstParagraph = document.createParagraph();
-			firstParagraph.setAlignment(ParagraphAlignment.LEFT);
+			// 段落
+			for (File file : pathes) {
+				XWPFParagraph firstParagraph = document.createParagraph();
+				firstParagraph.setAlignment(ParagraphAlignment.LEFT);
 
-			XWPFRun run = firstParagraph.createRun();
-			StringBuffer sb = new StringBuffer();
-			List<String> readLines = FileUtils.readLines(file, "UTF-8");
-			for (int i = 0; i < readLines.size(); i++) {
-				String string = readLines.get(i);
-				sb.append(string).append(System.getProperty("line.separator"));
-			}
-
-			String result = sb.toString();
-			// 去掉注释
-			/// \*[\w\W]*?\*/
-			//// .*
-			result = result.replaceAll("\\*[\\w\\W]*?\\*/", "");
-			result = result.replaceAll("//.*", "");
-
-			// 去掉空白行(?m)^\\s*$(\\n|\\r\\n)
-			result = result.replaceAll("(?m)^\\s*$(\\n|\\r\\n)", "");
-
-			if (result.contains("\n")) {
-				String[] lines = result.split("\n");
-				run.setText(lines[0], 0); // set first line into XWPFRun
-				for (int i = 1; i < lines.length; i++) {
-					// add break and insert new text
-					run.addBreak();
-					run.setText(lines[i]);
+				XWPFRun run = firstParagraph.createRun();
+				StringBuffer sb = new StringBuffer();
+				List<String> readLines;
+				try {
+					readLines = FileUtils.readLines(file, "UTF-8");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					Display.getDefault().syncExec(() -> {
+						bars.getStatusLineManager().setMessage("错误");
+						updateUIByEnable(true);
+					});
+					return;
 				}
-			} else {
-				run.setText(result, 0);
+				for (int i = 0; i < readLines.size(); i++) {
+					String string = readLines.get(i);
+					sb.append(string).append(System.getProperty("line.separator"));
+				}
+
+				String result = sb.toString();
+				// 去掉注释
+				/// \*[\w\W]*?\*/
+				//// .*
+				result = result.replaceAll("\\*[\\w\\W]*?\\*/", "");
+				result = result.replaceAll("//.*", "");
+
+				// 去掉空白行(?m)^\\s*$(\\n|\\r\\n)
+				result = result.replaceAll("(?m)^\\s*$(\\n|\\r\\n)", "");
+
+				if (result.contains("\n")) {
+					String[] lines = result.split("\n");
+					run.setText(lines[0], 0); // set first line into XWPFRun
+					for (int i = 1; i < lines.length; i++) {
+						// add break and insert new text
+						run.addBreak();
+						run.setText(lines[i]);
+					}
+				} else {
+					run.setText(result, 0);
+				}
 			}
-		}
-		
 
-		document.createTOC();
-		
+			document.createTOC();
 
-		document.write(out);
-		out.close();
+			try {
+				document.write(out);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				out.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
-		addFileTypeButton.setEnabled(true);
-		resetFileTypeButton.setEnabled(true);
-		combo.setEnabled(true);
-		inputDirText.setEnabled(true);
-		exportFilePathText.setEnabled(true);
-		exportButton.setEnabled(true);
-		inputButton.setEnabled(true);
-		exportFileButton.setEnabled(true);
+			Display.getDefault().syncExec(() -> {
+				bars.getStatusLineManager().setMessage("成功");
+				updateUIByEnable(true);
+			});
+
+		});
+
+	}
+
+	private void updateUIByEnable(boolean enabled) {
+		addFileTypeButton.setEnabled(enabled);
+		resetFileTypeButton.setEnabled(enabled);
+		combo.setEnabled(enabled);
+		inputDirText.setEnabled(enabled);
+		exportFilePathText.setEnabled(enabled);
+		exportButton.setEnabled(enabled);
+		inputButton.setEnabled(enabled);
+		exportFileButton.setEnabled(enabled);
 	}
 
 	private void startExport() throws IOException {
@@ -198,14 +252,7 @@ public class MainView extends ViewPart {
 			return;
 		}
 
-		addFileTypeButton.setEnabled(false);
-		resetFileTypeButton.setEnabled(false);
-		combo.setEnabled(false);
-		inputDirText.setEnabled(false);
-		exportFilePathText.setEnabled(false);
-		exportButton.setEnabled(false);
-		inputButton.setEnabled(false);
-		exportFileButton.setEnabled(false);
+		updateUIByEnable(false);
 
 		createWord2007();
 	}
