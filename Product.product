@@ -19,14 +19,20 @@
 
 
    <launcher>
+      <macosx icon="icons/icon.icns"/>
       <win useIco="false">
-         <bmp/>
+         <bmp
+            winSmallHigh="icons/word.bmp"
+            winMediumHigh="icons/word32.bmp"
+            winLargeHigh="icons/word48.bmp"
+            winExtraLargeHigh="icons/word256.bmp"/>
       </win>
    </launcher>
 
 
    <vm>
    </vm>
+
 
    <plugins>
       <plugin id="CodeExport"/>
