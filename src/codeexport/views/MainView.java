@@ -31,6 +31,10 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.jface.viewers.ComboViewer;
 
 /**
  * This sample class demonstrates how to plug-in a new workbench view. The view
@@ -70,6 +74,13 @@ public class MainView extends ViewPart {
 	private Button exportButton;
 
 	private Button exportFileButton;
+	private Label label_1;
+	private Label label_2;
+	private Combo combo;
+	private ComboViewer comboViewer;
+	private Button addFileTypeButton;
+	private Composite composite;
+	private Button resetFileTypeButton;
 
 	/**
 	 * 2007word文档创建
@@ -77,14 +88,13 @@ public class MainView extends ViewPart {
 	 * @throws IOException
 	 */
 	private void createWord2007() throws IOException {
-		
-		
+
 		inputDirText.getText();
-		String[] fileFilter = new String[] {"m","java"};
+		String[] fileFilter = new String[] { "m", "java" };
 		Collection<File> pathes = FileUtils.listFiles(new File(inputDirText.getText()), fileFilter, true);
 		String exportPath = exportFilePathText.getText();
 		exportPath = exportPath + File.separator + System.currentTimeMillis() + ".docx";
-		
+
 //		txt
 //		File f = new File(exportPath);
 //		for (File file : pathes) {
@@ -107,19 +117,18 @@ public class MainView extends ViewPart {
 //			
 //			FileUtils.write(f, result, "UTF-8", true);
 //		}
-		
+
 //		word
 		// Write the Document in file system
 //		exportPath
 		FileOutputStream out = new FileOutputStream(new File(exportPath));
 //		FileOutputStream out = new FileOutputStream(new File("/Users/jv/Desktop/create_toc.docx"));
 
-
 		// 段落
 		for (File file : pathes) {
 			XWPFParagraph firstParagraph = document.createParagraph();
 			firstParagraph.setAlignment(ParagraphAlignment.LEFT);
-			
+
 			XWPFRun run = firstParagraph.createRun();
 			StringBuffer sb = new StringBuffer();
 			List<String> readLines = FileUtils.readLines(file, "UTF-8");
@@ -127,36 +136,38 @@ public class MainView extends ViewPart {
 				String string = readLines.get(i);
 				sb.append(string).append(System.getProperty("line.separator"));
 			}
-			
+
 			String result = sb.toString();
-			//去掉注释
-			///\*[\w\W]*?\*/
-			////.*
+			// 去掉注释
+			/// \*[\w\W]*?\*/
+			//// .*
 			result = result.replaceAll("\\*[\\w\\W]*?\\*/", "");
 			result = result.replaceAll("//.*", "");
-			
-			//去掉空白行(?m)^\\s*$(\\n|\\r\\n)
+
+			// 去掉空白行(?m)^\\s*$(\\n|\\r\\n)
 			result = result.replaceAll("(?m)^\\s*$(\\n|\\r\\n)", "");
-			
+
 			if (result.contains("\n")) {
-                String[] lines = result.split("\n");
-                run.setText(lines[0], 0); // set first line into XWPFRun
-                for(int i=1;i<lines.length;i++){
-                    // add break and insert new text
-                    run.addBreak();
-                    run.setText(lines[i]);
-                }
-            } else {
-                run.setText(result, 0);
-            }
+				String[] lines = result.split("\n");
+				run.setText(lines[0], 0); // set first line into XWPFRun
+				for (int i = 1; i < lines.length; i++) {
+					// add break and insert new text
+					run.addBreak();
+					run.setText(lines[i]);
+				}
+			} else {
+				run.setText(result, 0);
+			}
 		}
-		
 
 		document.createTOC();
 
 		document.write(out);
 		out.close();
-		
+
+		addFileTypeButton.setEnabled(true);
+		resetFileTypeButton.setEnabled(true);
+		combo.setEnabled(true);
 		inputDirText.setEnabled(true);
 		exportFilePathText.setEnabled(true);
 		exportButton.setEnabled(true);
@@ -169,20 +180,23 @@ public class MainView extends ViewPart {
 		if (inputDirText.getText().isEmpty()) {
 
 			MessageDialog.openError(null, "提示", "根目录为空");
-			
+
 			inputButton.notifyListeners(SWT.Selection, new Event());
-			
+
 			return;
 		}
-		
+
 		if (exportFilePathText.getText().isEmpty()) {
 
 			MessageDialog.openError(null, "提示", "导出目录为空");
 			exportButton.notifyListeners(SWT.Selection, new Event());
-			
+
 			return;
 		}
-		
+
+		addFileTypeButton.setEnabled(false);
+		resetFileTypeButton.setEnabled(false);
+		combo.setEnabled(false);
 		inputDirText.setEnabled(false);
 		exportFilePathText.setEnabled(false);
 		exportButton.setEnabled(false);
@@ -197,20 +211,20 @@ public class MainView extends ViewPart {
 		parent.setLayout(new GridLayout(3, false));
 
 		Label fileLabel = new Label(parent, SWT.NONE);
-		fileLabel.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
+		fileLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		fileLabel.setText("目录路径");
 
 		inputDirText = new Text(parent, SWT.BORDER);
 		inputDirText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		inputButton = new Button(parent, SWT.NONE);
+		inputButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 		inputButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				DirectoryDialog dd = new DirectoryDialog(workbench.getDisplay().getActiveShell());
 				String path = dd.open();
-				if(path!= null && !path.isEmpty())
-				{
+				if (path != null && !path.isEmpty()) {
 					inputDirText.setText(path);
 				}
 			}
@@ -237,6 +251,44 @@ public class MainView extends ViewPart {
 		});
 		exportButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 		exportButton.setText("导出目录");
+
+		label_2 = new Label(parent, SWT.NONE);
+		label_2.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		label_2.setText("文件类型");
+
+		comboViewer = new ComboViewer(parent, SWT.NONE);
+		combo = comboViewer.getCombo();
+		combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+		composite = new Composite(parent, SWT.NONE);
+		composite.setLayout(new FillLayout(SWT.HORIZONTAL));
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+
+		addFileTypeButton = new Button(composite, SWT.NONE);
+		addFileTypeButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				String s = combo.getText();
+				if (s != null && !s.isEmpty()) {
+					combo.add(s);
+					combo.setText("");
+				}
+			}
+		});
+		addFileTypeButton.setText("添加文件类型");
+
+		resetFileTypeButton = new Button(composite, SWT.NONE);
+		resetFileTypeButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				combo.setText("");
+				combo.removeAll();
+			}
+		});
+		resetFileTypeButton.setText("重置文件类型");
+
+		label_1 = new Label(parent, SWT.NONE);
+		label_1.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 1, 1));
 
 		exportFileButton = new Button(parent, SWT.NONE);
 		exportFileButton.addSelectionListener(new SelectionAdapter() {
