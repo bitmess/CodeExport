@@ -41,6 +41,10 @@
                name="aboutImage"
                value="icons/word.png">
          </property>
+         <property
+               name="appName"
+               value="代码导出Word">
+         </property>
       </product>
    </extension>
    <extension
