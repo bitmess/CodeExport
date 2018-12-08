@@ -17,29 +17,29 @@
             allowMultiple="false"
             category="CodeExport"
             class="codeexport.views.MainView"
-            icon="icons/sample.png"
+            icon="icons/word.png"
             id="codeexport.views.MainView"
             inject="true"
-            name="Main View">
+            name="代码导出Word">
       </view>
    </extension>
    <extension
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
-            name="RCP Product"
+            name="代码导出Word"
             application="CodeExport.application">
          <property
-               name="aboutText"
-               value="RCP Mail template created by PDE">
+               name="关于"
+               value="代码导出为Word">
          </property>
          <property
                name="windowImages"
-               value="icons/sample2.gif">
+               value="icons/word.png">
          </property>
          <property
                name="aboutImage"
-               value="product_lg.gif">
+               value="icons/word.png">
          </property>
       </product>
    </extension>
