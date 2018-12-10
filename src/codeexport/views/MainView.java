@@ -143,9 +143,9 @@ public class MainView extends ViewPart {
 			document = new XWPFDocument();// 文档
 
 			// 段落
+			XWPFParagraph firstParagraph = document.createParagraph();
+			firstParagraph.setAlignment(ParagraphAlignment.LEFT);
 			for (File file : pathes) {
-				XWPFParagraph firstParagraph = document.createParagraph();
-				firstParagraph.setAlignment(ParagraphAlignment.LEFT);
 
 				XWPFRun run = firstParagraph.createRun();
 				StringBuffer sb = new StringBuffer();
@@ -172,26 +172,26 @@ public class MainView extends ViewPart {
 				//// .*
 				result = result.replaceAll("\\*[\\w\\W]*?\\*/", "");
 				result = result.replaceAll("(?:/\\*(?:[^*]|(?:\\*+[^*/]))*\\*+/)|(?://.*)","");
-				result = result.replaceAll("/","");
+				result = result.replaceAll("/$|/\\s+","");
 
 				// 去掉空白行(?m)^\\s*$(\\n|\\r\\n)
 				result = result.replaceAll("(?m)^\\s*$(\\n|\\r\\n)", "");
-				result = result.replaceAll("(\\n|\\r\\n|\\r)", "");
 
 				if (result.contains("\n")) {
 					String[] lines = result.split("\n");
 					run.setText(lines[0], 0); // set first line into XWPFRun
 					for (int i = 1; i < lines.length; i++) {
 						// add break and insert new text
-						run.addBreak();
-						run.setText(lines[i]);
+						if(!lines[i].trim().isEmpty()) {
+							run.setText(lines[i]);
+						}
+//						run.addBreak();
 					}
 				} else {
 					run.setText(result, 0);
 				}
 			}
 
-			document.createTOC();
 
 			try {
 				document.write(out);
@@ -308,6 +308,7 @@ public class MainView extends ViewPart {
 
 		comboViewer = new ComboViewer(parent, SWT.NONE);
 		combo = comboViewer.getCombo();
+		combo.setItems(new String[] {"java", "m"});
 		combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
 		composite = new Composite(parent, SWT.NONE);
