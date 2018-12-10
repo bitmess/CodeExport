@@ -185,7 +185,7 @@ public class MainView extends ViewPart {
 						if(!lines[i].trim().isEmpty()) {
 							run.setText(lines[i]);
 						}
-//						run.addBreak();
+						run.addBreak();
 					}
 				} else {
 					run.setText(result, 0);
