@@ -17,22 +17,22 @@
 
    <windowImages i16="icons/word.png" i32="icons/word32.png" i48="icons/word48.png" i64="icons/word64.png" i128="icons/word128.png" i256="icons/word256.png"/>
 
-
    <launcher>
       <macosx icon="icons/icon.icns"/>
       <win useIco="false">
          <bmp
             winSmallHigh="icons/word.bmp"
+            winSmallLow="icons/word-8.bmp"
             winMediumHigh="icons/word32.bmp"
+            winMediumLow="icons/word32-8.bmp"
             winLargeHigh="icons/word48.bmp"
+            winLargeLow="icons/word48-8.bmp"
             winExtraLargeHigh="icons/word256.bmp"/>
       </win>
    </launcher>
 
-
    <vm>
    </vm>
-
 
    <plugins>
       <plugin id="CodeExport"/>

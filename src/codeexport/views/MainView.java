@@ -171,10 +171,12 @@ public class MainView extends ViewPart {
 				/// \*[\w\W]*?\*/
 				//// .*
 				result = result.replaceAll("\\*[\\w\\W]*?\\*/", "");
-				result = result.replaceAll("//.*", "");
+				result = result.replaceAll("(?:/\\*(?:[^*]|(?:\\*+[^*/]))*\\*+/)|(?://.*)","");
+				result = result.replaceAll("/","");
 
 				// 去掉空白行(?m)^\\s*$(\\n|\\r\\n)
 				result = result.replaceAll("(?m)^\\s*$(\\n|\\r\\n)", "");
+				result = result.replaceAll("(\\n|\\r\\n|\\r)", "");
 
 				if (result.contains("\n")) {
 					String[] lines = result.split("\n");
