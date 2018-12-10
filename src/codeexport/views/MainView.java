@@ -182,10 +182,8 @@ public class MainView extends ViewPart {
 					run.setText(lines[0], 0); // set first line into XWPFRun
 					for (int i = 1; i < lines.length; i++) {
 						// add break and insert new text
-						if(!lines[i].trim().isEmpty()) {
-							run.setText(lines[i]);
-						}
 						run.addBreak();
+						run.setText(lines[i]);
 					}
 				} else {
 					run.setText(result, 0);
